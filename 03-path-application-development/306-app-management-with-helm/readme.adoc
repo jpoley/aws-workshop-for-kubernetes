@@ -8,7 +8,7 @@ https://github.com/kubernetes/helm[Helm] is a tool for managing https://github.c
 
 == Prerequisites
 
-This chapter uses a cluster with 3 master nodes and 5 worker nodes as described here: link:../cluster-install#multi-master-multi-node-multi-az-gossip-based-cluster[multi-master, multi-node gossip based cluster].
+In order to perform exercises in this chapter, you’ll need to deploy configurations to a Kubernetes cluster. To create an EKS-based Kubernetes cluster, use the link:../../01-path-basics/102-your-first-cluster#create-a-kubernetes-cluster-with-eks[AWS CLI] (recommended). If you wish to create a Kubernetes cluster without EKS, you can instead use link:../../01-path-basics/102-your-first-cluster#alternative-create-a-kubernetes-cluster-with-kops[kops].
 
 All configuration files for this chapter are in the `helm` directory. Make sure you change to that directory before giving any commands in this chapter.
 
@@ -155,11 +155,11 @@ webapp-deployment-372583675-hlcbg   1/1       Running   0          1m
 
 Start a proxy. Since the webapp service does not expose a public endpoint, proxy will allow you to access your service endpoint via the Kubernetes API:
 
-  kubectl proxy
+  kubectl proxy --address 0.0.0.0 --accept-hosts '.*' --port 8080
 
 Access the application using:
 
-  curl http://localhost:8001/api/v1/proxy/namespaces/default/services/webapp/resources/employees
+  curl -k https://ENVIRONMENT_ID.vfs.cloud9.REGION_ID.amazonaws.com/api/v1/proxy/namespaces/default/services/webapp/resources/employees
 
 This shows the output:
 

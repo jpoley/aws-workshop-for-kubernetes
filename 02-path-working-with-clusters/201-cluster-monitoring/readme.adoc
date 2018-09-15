@@ -18,9 +18,9 @@ Heapster is limited to Kuberenetes container metrics, it is not general use. Hea
 
 == Prerequisites
 
-This chapter uses a cluster with 3 master nodes and 5 worker nodes as described here: link:../cluster-install#multi-master-multi-node-multi-az-gossip-based-cluster[multi-master, multi-node gossip based cluster].
+In order to perform exercises in this chapter, you’ll need to deploy configurations to a Kubernetes cluster. To create an EKS-based Kubernetes cluster, use the link:../../01-path-basics/102-your-first-cluster#create-a-kubernetes-cluster-with-eks[AWS CLI] (recommended). If you wish to create a Kubernetes cluster without EKS, you can instead use link:../../01-path-basics/102-your-first-cluster#alternative-create-a-kubernetes-cluster-with-kops[kops].
 
-All configuration files for this chapter are in the `cluster-monitoring` directory. Make sure you change to that directory before giving any commands in this chapter.
+All configuration files for this chapter are in the link:templates[201-cluster-monitoring/templates] directory.
 
 == Kubernetes Dashboard
 
@@ -47,9 +47,13 @@ If you are using v1.8 or above, deploy the Dashboard using the following command
 
 Dashboard can be seen using the following command:
 
-    kubectl proxy
+    kubectl proxy --address 0.0.0.0 --accept-hosts '.*' --port 8080
 
-Now, Dashboard is accessible at http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/.
+Now, Dashboard is accessible via `Preview`, `Preview Running Application` as:
+
+    https://ENVIRONMENT_ID.vfs.cloud9.REGION_ID.amazonaws.com/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
+
+Where `ENVIRONMENT_ID` is your Cloud9 IDE environment id (you should see it once click the built-in browser address bar) and `REGION_ID` is AWS region id (e.g. us-east-1).
 
 Starting with Kubernetes 1.7, Dashboard supports authentication. Read more about it at https://github.com/kubernetes/dashboard/wiki/Access-control#introduction. We'll use a bearer token for authentication.
 
@@ -90,16 +94,16 @@ It shows the output as:
   statefulset-controller-token-kmgzg       kubernetes.io/service-account-token   3         3h
   ttl-controller-token-vbnhf               kubernetes.io/service-account-token   3         3h
 
-We can login using any secret with type 'kubernetes.io/service-account-token', though each of them have different privileges. In our case, we'll use the token from secret `default-token-7vh0x` to login. Use the following command to get the token for this secret:
+We can login using the secret with type 'kubernetes.io/namespace-controller-token'. In our case, we'll use the token from secret `namespace-controller-token-423gh` to login. Use the following command to get the token for this secret:
 
-    kubectl -n kube-system describe secret default-token-7vh0x
+    kubectl -n kube-system describe secret namespace-controller-token-423gh
 
-Note you'll need to replace `default-token-7vh0x` with the default-token from your output list.
+Note you'll need to replace `namespace-controller-token-423gh` with the namespace-controller-token from your output list.
 
 It shows the output:
 
 ```
-Name:         default-token-7vh0x
+Name:         namespace-controller-token-423gh
 Namespace:    kube-system
 Labels:       <none>
 Annotations:  kubernetes.io/service-account.name=default
@@ -122,7 +126,7 @@ Click on `Nodes` to see a textual representation about the nodes running in the 
 
 image::monitoring-nodes-before.png[]
 
-Install a Java application as explained in link:../helm[Deploying applications using Kubernetes Helm charts].
+Install a Java application as explained in link:../../03-path-application-development/306-app-management-with-helm[Deploying applications using Kubernetes Helm charts].
 
 Click on `Pods`, again to see a textual representation about the pods running in the cluster:
 
@@ -152,9 +156,9 @@ Execute this command to install Heapster, InfluxDB and Grafana:
   deployment "monitoring-influxdb" created
   service "monitoring-influxdb" created
 
-Heapster is now aggregating metrics from the cAdvisor instances running on each node. This data is stored in an InfluxDB instance running in the cluster. Grafana dashboard, accessible at http://localhost:8001/api/v1/namespaces/kube-system/services/monitoring-grafana/proxy/?orgId=1, now shows the information about the cluster.
+Heapster is now aggregating metrics from the cAdvisor instances running on each node. This data is stored in an InfluxDB instance running in the cluster. Grafana dashboard, accessible at https://ENVIRONMENT_ID.vfs.cloud9.REGION_ID.amazonaws.com/api/v1/namespaces/kube-system/services/monitoring-grafana/proxy/?orgId=1, now shows the information about the cluster.
 
-NOTE: Grafana dashboard will not be available if Kubernetes proxy is not running. If proxy is not running, it can be started with the command `kubectl proxy`.
+NOTE: Grafana dashboard will not be available if Kubernetes proxy is not running. If proxy is not running, it can be started with the command `kubectl proxy --address 0.0.0.0 --accept-hosts '.*' --port 8080`.
 
 === Grafana dashboard
 

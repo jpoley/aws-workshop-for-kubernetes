@@ -14,9 +14,11 @@ For our usecase, the application initially uses the image `arungupta/app-upgrade
 
 == Prerequisites
 
-This chapter uses a cluster with 3 master nodes and 5 worker nodes as described here: link:../cluster-install#multi-master-multi-node-multi-az-gossip-based-cluster[multi-master, multi-node gossip based cluster].
+In order to perform exercises in this chapter, you’ll need to deploy configurations to a Kubernetes cluster. To create an EKS-based Kubernetes cluster, use the link:../../01-path-basics/102-your-first-cluster#create-a-kubernetes-cluster-with-eks[AWS CLI] (recommended). If you wish to create a Kubernetes cluster without EKS, you can instead use link:../../01-path-basics/102-your-first-cluster#alternative-create-a-kubernetes-cluster-with-kops[kops].
 
-All configuration files for this chapter are in the `app-udpate` directory. Make sure you change to that directory before giving any commands in this chapter.
+All configuration files for this chapter are in the `app-update` directory. Make sure you change to that directory before giving any commands in this chapter.  If you are working in Cloud9, run:
+
+    cd ~/environment/aws-workshop-for-kubernetes/03-path-application-development/303-app-update/
 
 == Update and Rollback
 
@@ -33,12 +35,15 @@ Let's look at these two deployment strategies.
 
 All existing pods are killed before the new ones are created. The configuration file looks like:
 
-    apiVersion: extensions/v1beta1
+    apiVersion: apps/v1
     kind: Deployment
     metadata:
       name: app-recreate
     spec:
       replicas: 5
+      selector:
+        matchLabels:
+          name: app-recreate
       strategy:
         type: Recreate
       template:
@@ -193,12 +198,15 @@ Two optional properties can be used to define how rolling update is performed:
 
 The configuration file looks like:
 
-    apiVersion: extensions/v1beta1
+    apiVersion: apps/v1
     kind: Deployment
     metadata:
       name: app-rolling
     spec:
       replicas: 5
+      selector:
+        matchLabels:
+          name: app-rolling
       strategy:
         type: RollingUpdate
         rollingUpdate:
@@ -389,12 +397,16 @@ Two Deployments with image for different versions are used togther. Both Deploym
 
 Let's look at version `v1` of the Deployment:
 
-    apiVersion: extensions/v1beta1
+    apiVersion: apps/v1
     kind: Deployment
     metadata:
       name: app-v1
     spec:
       replicas: 2
+      selector:
+        matchLabels:
+          name: app
+          version: v1
       template:
         metadata:
           labels:
@@ -411,12 +423,16 @@ It uses `arungupta/app-upgrade:v1` image. It has two labels `name: app` and `ver
 
 Let's look at version `v2` of the Deployment:
 
-    apiVersion: extensions/v1beta1
+    apiVersion: apps/v1
     kind: Deployment
     metadata:
       name: app-v2
     spec:
       replicas: 2
+      selector:
+        matchLabels:
+          name: app
+          version: v2
       template:
         metadata:
           labels:

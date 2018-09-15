@@ -19,8 +19,7 @@ There is no default Ingress controller provided in Kubernetes. It may be provide
 Since an Ingress controller is not provided on AWS by default, we will install one.
 
 == Prerequisites
-
-This chapter uses a cluster with 3 master nodes and 5 worker nodes as described here: link:../cluster-install#multi-master-multi-node-multi-az-gossip-based-cluster[multi-master, multi-node gossip based cluster].
+In order to perform exercises in this chapter, you’ll need to deploy configurations to a Kubernetes cluster. To create an EKS-based Kubernetes cluster, use the link:../../01-path-basics/102-your-first-cluster#create-a-kubernetes-cluster-with-eks[AWS CLI] (recommended). If you wish to create a Kubernetes cluster without EKS, you can instead use link:../../01-path-basics/102-your-first-cluster#alternative-create-a-kubernetes-cluster-with-kops[kops].
 
 == Nginx Ingress Controller
 
@@ -36,7 +35,7 @@ First, apply the initial setup commands:
 
 RBAC roles, or Role Based Access Control, are methods for controlling access to resources based on roles and permissions of individual users. RBAC must be enabled on the api server with the flag, `--authorization-mode=RBAC`. A `Role` can be used to restrict access to a single namespace. Alternatively, a `ClusterRole` can apply access permissions to a particular namespace or across all namespaces. In addition, `RoleBinding` binds the permissions granted by a role to a single user or set of users. `ClusterRoleBinding` can grant these permissions cluster wide and across all namespaces.
 
-To configure the Nginx Ingress Controller with RBAC roles use the following command:
+To configure the Nginx Ingress Controller without RBAC roles use the following command:
 
 	curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/without-rbac.yaml | kubectl apply -f -
 
@@ -301,6 +300,7 @@ kube-aws-ingress-controller, which we will use:
     "autoscaling:DetachLoadBalancers",
     "autoscaling:DetachLoadBalancerTargetGroups",
     "autoscaling:AttachLoadBalancerTargetGroups",
+    "autoscaling:DescribeLoadBalancerTargetGroups",
     "cloudformation:*",
     "elasticloadbalancing:*",
     "elasticloadbalancingv2:*",
@@ -338,6 +338,7 @@ and add this to your node policy:
             "autoscaling:DetachLoadBalancers",
             "autoscaling:DetachLoadBalancerTargetGroups",
             "autoscaling:AttachLoadBalancerTargetGroups",
+            "autoscaling:DescribeLoadBalancerTargetGroups",
             "cloudformation:*",
             "elasticloadbalancing:*",
             "elasticloadbalancingv2:*",
